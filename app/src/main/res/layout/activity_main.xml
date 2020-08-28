@@ -26,9 +26,11 @@
                     android:id="@+id/branch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:checkedButton="@+id/branchMaster">
 
                     <RadioButton
+                        android:id="@+id/branchMaster"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="master" />

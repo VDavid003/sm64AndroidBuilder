@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
         pathUnsetDialog.setOnShowListener(onShowListener);
 
         branch = findViewById(R.id.branch);
-        branch.check(sharedPreferences.getInt("branch", 1));
+        if(sharedPreferences.contains("branch"))
+            branch.check(sharedPreferences.getInt("branch", 1));
         flags = findViewById(R.id.flags);
         loadFlags(flags);
     }
@@ -230,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
     private String GetBranch() {
         int buttonId = branch.getCheckedRadioButtonId();
         RadioButton radioButton = branch.findViewById(buttonId);
+        if(radioButton == null) return "master";
         return radioButton.getText().toString();
     }
 
