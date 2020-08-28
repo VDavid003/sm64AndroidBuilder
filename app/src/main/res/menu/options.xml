@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/initButton"
+        android:title="Show Initial Setup" />
+    <item android:id="@+id/settingsButton"
+        android:title="Settings" />
+</menu>

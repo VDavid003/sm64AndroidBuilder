@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_name"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:layout_gravity="center" android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:text="Initial Setup" android:textSize="30sp"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView
+        android:text="This application requires Termux."
+        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/setupTermuxDownloadText"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/termuxDownloadButton"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="Download"
+        android:onClick="download"/>
+
+    <TextView
+        android:text="Before you start, please initialize the builder inside Termux by pasting the command below inside it."
+        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp">
+        <EditText
+            android:id="@+id/copySetupText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/setup_command"
+            android:inputType="none"
+            android:textIsSelectable="true"
+            android:layout_weight="1"
+            android:hint="Code"
+            android:importantForAutofill="no" />
+        <Button
+            android:id="@+id/copySetupButton"
+            android:layout_width="96dp"
+            android:layout_height="match_parent"
+            android:text="Copy"
+            android:onClick="copySetup"/>
+    </LinearLayout>
+    <TextView
+        android:text="Port and builder made by: VDavid003"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+</LinearLayout>

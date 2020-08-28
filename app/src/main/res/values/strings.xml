@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">sm64AndroidBuilder</string>
+    <string name="setup_command">pkg install git wget make python getconf zip apksigner clang -y &amp;&amp; wget https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/sm64AndroidBuilder &amp;&amp; chmod +x sm64AndroidBuilder &amp;&amp; ./sm64AndroidBuilder init</string>
+</resources>

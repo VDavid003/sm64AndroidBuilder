@@ -1,0 +1,25 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="Paths">
+        <com.vdavid003.sm64androidbuilder.DirectoryPreference
+            app:title="Termux sm64-port-android directory"
+            android:summary="%s"
+            app:key="termuxDir"/>
+        <com.vdavid003.sm64androidbuilder.FilePreference
+            app:title="Base ROM"
+            android:summary="%s"
+            app:key="baseROM"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Other">
+        <ListPreference
+            android:title="ROM Version"
+            android:summary="%s"
+            android:key="version"
+            android:entries="@array/versions"
+            android:entryValues="@array/versionValues"
+            android:defaultValue="auto"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
