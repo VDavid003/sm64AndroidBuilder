@@ -38,12 +38,12 @@
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="sm64ex" />
+                        android:text="ex/master" />
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="sm64ex_nightly" />
+                        android:text="ex/nightly" />
                 </RadioGroup>
             </HorizontalScrollView>
 
@@ -65,11 +65,23 @@
                     android:orientation="vertical">
 
                     <CheckBox
-                        android:id="@+id/touchControls"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="TOUCH_CONTROLS"
                         android:checked="true"/>
+                    <CheckBox
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="NODRAWINGDISTANCE"/>
+                    <CheckBox
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="EXT_OPTIONS_MENU"
+                        android:checked="true"/>
+                    <CheckBox
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="EXTERNAL_DATA"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="0dp"
@@ -78,10 +90,17 @@
                     android:orientation="vertical">
 
                     <CheckBox
-                        android:id="@+id/placeholder"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Placeholder"/>
+                        android:text="BETTERCAMERA"/>
+                    <CheckBox
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TEXTURE_FIX"/>
+                    <CheckBox
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TEXTSAVES"/>
                 </LinearLayout>
             </LinearLayout>
 

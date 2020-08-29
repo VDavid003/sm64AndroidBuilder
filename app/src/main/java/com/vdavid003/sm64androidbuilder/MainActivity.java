@@ -30,6 +30,10 @@ import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +44,38 @@ public class MainActivity extends AppCompatActivity {
     final SetupDialog setupDialog = SetupDialog.newInstance();
     RadioGroup branch;
     LinearLayout flags;
+
+    Map<String, boolean[]> FlagsMap = new HashMap<String, boolean[]>() {
+        {
+            put("master", new boolean[]{
+                    true, //TOUCH_CONTROLS
+                    false, //NODRAWINGDISTANCE
+                    false, //EXT_OPTIONS_MENU
+                    false, //EXTERNAL_DATA
+                    false, //BETTERCAMERA
+                    false, //TEXTURE_FIX
+                    false, //TEXTSAVES
+            });
+            put("ex/master", new boolean[]{
+                    true, //TOUCH_CONTROLS
+                    true, //NODRAWINGDISTANCE
+                    true, //EXT_OPTIONS_MENU
+                    true, //EXTERNAL_DATA
+                    true, //BETTERCAMERA
+                    true, //TEXTURE_FIX
+                    true //TEXTSAVES
+            });
+            put("ex/nightly", new boolean[]{
+                    true, //TOUCH_CONTROLS
+                    true, //NODRAWINGDISTANCE
+                    true, //EXT_OPTIONS_MENU
+                    true, //EXTERNAL_DATA
+                    true, //BETTERCAMERA
+                    true, //TEXTURE_FIX
+                    true //TEXTSAVES
+            });
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,14 +132,37 @@ public class MainActivity extends AppCompatActivity {
         branch = findViewById(R.id.branch);
         if(sharedPreferences.contains("branch"))
             branch.check(sharedPreferences.getInt("branch", 1));
+
         flags = findViewById(R.id.flags);
         loadFlags(flags);
+
+        branch.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                RadioButton radioButton = radioGroup.findViewById(i);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("branch", radioGroup.getCheckedRadioButtonId());
+                editor.apply();
+                int j = 0;
+                for (CheckBox checkBox : getFlagCheckboxes(flags)) {
+                    checkBox.setEnabled(FlagsMap.get(radioButton.getText())[j]);
+                    j++;
+                }
+            }
+        });
+
+        RadioButton selectedBranch = branch.findViewById(branch.getCheckedRadioButtonId());
+        int j = 0;
+        for (CheckBox checkBox : getFlagCheckboxes(flags)) {
+            checkBox.setEnabled(FlagsMap.get(selectedBranch.getText())[j]);
+            j++;
+        }
     }
 
     @Override
     public void onPause() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("branch", branch.getCheckedRadioButtonId());
         saveFlags(flags, editor);
         editor.apply();
         super.onPause();
@@ -132,6 +191,19 @@ public class MainActivity extends AppCompatActivity {
                     checkBox.setChecked(sharedPreferences.getBoolean((String)checkBox.getText(), false));
             }
         }
+    }
+
+    private List<CheckBox> getFlagCheckboxes(LinearLayout parent) {
+        List<CheckBox> checkBoxList = new ArrayList<CheckBox>();
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            View view = parent.getChildAt(i);
+            if (view instanceof LinearLayout)
+                checkBoxList.addAll(getFlagCheckboxes((LinearLayout) view));
+            else if (view instanceof CheckBox) {
+                checkBoxList.add((CheckBox) view);
+            }
+        }
+        return checkBoxList;
     }
 
     private boolean testPaths() {
@@ -257,7 +329,8 @@ public class MainActivity extends AppCompatActivity {
                 str.append(GetFlags((LinearLayout) view));
             else if (view instanceof CheckBox) {
                 CheckBox checkBox = (CheckBox) view;
-                str.append(checkBox.getText()).append("=").append(checkBox.isChecked() ? "1" : "0").append(" ");
+                if(checkBox.isEnabled())
+                    str.append(checkBox.getText()).append("=").append(checkBox.isChecked() ? "1" : "0").append(" ");
             }
         }
         return str.toString();
