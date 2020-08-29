@@ -130,8 +130,9 @@ public class MainActivity extends AppCompatActivity {
         pathUnsetDialog.setOnShowListener(onShowListener);
 
         branch = findViewById(R.id.branch);
-        if(sharedPreferences.contains("branch"))
-            branch.check(sharedPreferences.getInt("branch", 1));
+        if(sharedPreferences.contains("branch")) {
+            ((RadioButton)branch.getChildAt(sharedPreferences.getInt("branch", 1))).setChecked(true);
+        }
 
         flags = findViewById(R.id.flags);
         loadFlags(flags);
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 RadioButton radioButton = radioGroup.findViewById(i);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("branch", radioGroup.getCheckedRadioButtonId());
+                editor.putInt("branch", radioGroup.indexOfChild(radioButton));
                 editor.apply();
                 int j = 0;
                 for (CheckBox checkBox : getFlagCheckboxes(flags)) {
@@ -153,10 +154,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         RadioButton selectedBranch = branch.findViewById(branch.getCheckedRadioButtonId());
-        int j = 0;
-        for (CheckBox checkBox : getFlagCheckboxes(flags)) {
-            checkBox.setEnabled(FlagsMap.get(selectedBranch.getText())[j]);
-            j++;
+        if (selectedBranch != null) {
+            int j = 0;
+            for (CheckBox checkBox : getFlagCheckboxes(flags)) {
+                checkBox.setEnabled(FlagsMap.get(selectedBranch.getText())[j]);
+                j++;
+            }
         }
     }
 
