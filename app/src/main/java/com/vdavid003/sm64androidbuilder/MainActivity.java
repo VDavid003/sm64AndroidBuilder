@@ -26,7 +26,10 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -161,11 +164,14 @@ public class MainActivity extends AppCompatActivity {
                 j++;
             }
         }
+
+        ((TextView)findViewById(R.id.jobsInput)).setText(Integer.toString(sharedPreferences.getInt("jobs", 4)));
     }
 
     @Override
     public void onPause() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("jobs", Integer.parseInt(((TextView)findViewById(R.id.jobsInput)).getText().toString()));
         saveFlags(flags, editor);
         editor.apply();
         super.onPause();
@@ -294,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            String buildString = "./sm64AndroidBuilder make -b " + GetBranch() + GetOptions() + "-p \"" + GetFlags(flags) + '"';
+            String buildString = "./sm64AndroidBuilder make -b " + GetBranch() + GetOptions() + "-p \"" + GetFlags(flags) + "-j" + sharedPreferences.getInt("jobs", 4) + '"';
 
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("code", buildString);

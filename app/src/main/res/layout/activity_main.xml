@@ -134,6 +134,19 @@
                     android:layout_weight="1"
                     android:text="Full Reset"/>
             </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jobs:"/>
+            <EditText
+                android:id="@+id/jobsInput"
+                android:layout_width="32dp"
+                android:layout_height="48dp"
+                android:maxLength="1"
+                android:inputType="number"
+                android:importantForAutofill="no"
+                android:text="4"/>
         </LinearLayout>
     </ScrollView>
     <Button
