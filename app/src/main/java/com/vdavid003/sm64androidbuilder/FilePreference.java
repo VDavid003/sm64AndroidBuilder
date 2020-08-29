@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 
 public class FilePreference extends Preference {
+    private String mPath;
 
     public FilePreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -30,6 +31,7 @@ public class FilePreference extends Preference {
     }
 
     public void setPath(String path) {
+        mPath = path;
         persistString(path);
         notifyChanged();
     }
@@ -45,6 +47,12 @@ public class FilePreference extends Preference {
                     }
                 }
             });
+
+
+    @Override
+    public CharSequence getSummary() {
+        return super.getSummary().toString().replaceAll("%s", mPath);
+    }
 
     @Override
     protected void onClick() {

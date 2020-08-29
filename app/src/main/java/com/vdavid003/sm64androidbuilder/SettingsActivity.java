@@ -89,6 +89,9 @@ public class SettingsActivity extends AppCompatActivity {
                     autoString,
                     "US", "EU", "JP", "SH"
             });
+            if (versions.getValue().equals("auto")) {
+                versions.setSummary(autoString);
+            }
         }
     }
 

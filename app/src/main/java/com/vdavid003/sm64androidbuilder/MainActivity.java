@@ -231,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
         String version = sharedPreferences.getString("version", "");
         if (version.equals("auto"))
             version = sharedPreferences.getString("autoVersion", "");
+        if (version.equals(""))
+            version = "us";
         return "baserom." + version.toLowerCase() + ".z64";
     }
 
@@ -270,8 +272,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void copyBuild(View view) {
         if (testPaths()) {
-            if((DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("termuxDir", ""))).findFile(getBaseRomFileName()) == null) ||
-               !(sharedPreferences.getString("selectedSHA", "").equals(sharedPreferences.getString("baseROM", getBaseRomFileName() +"SHA"))))
+            //Delete it if it's different and it exists inside Termux
+            if (!(sharedPreferences.getString("selectedSHA", "").equals(sharedPreferences.getString(getBaseRomFileName() +"SHA", ""))) &&
+                 (DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("termuxDir", ""))).findFile(getBaseRomFileName()) != null)) {
+                DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("termuxDir", ""))).findFile(getBaseRomFileName()).delete();
+            }
+
+            if (DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("termuxDir", ""))).findFile(getBaseRomFileName()) == null)
             try {
                 Uri sourceFile = Uri.parse(sharedPreferences.getString("baseROM", ""));
                 ParcelFileDescriptor sourceFileDescriptor = getContentResolver().openFileDescriptor(sourceFile, "r");

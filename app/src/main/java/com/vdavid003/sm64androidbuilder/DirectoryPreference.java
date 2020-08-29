@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 
 public class DirectoryPreference extends Preference {
+    private String mPath;
 
     public DirectoryPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -30,6 +31,7 @@ public class DirectoryPreference extends Preference {
     }
 
     public void setPath(String path) {
+        mPath = path;
         persistString(path);
         notifyChanged();
     }
@@ -45,6 +47,11 @@ public class DirectoryPreference extends Preference {
                     }
                 }
             });
+
+    @Override
+    public CharSequence getSummary() {
+        return super.getSummary().toString().replaceAll("%s", mPath);
+    }
 
     @Override
     protected void onClick() {
