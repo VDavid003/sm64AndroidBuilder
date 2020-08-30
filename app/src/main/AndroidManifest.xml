@@ -18,5 +18,5 @@
             android:name=".SettingsActivity"
             android:label="Settings"></activity>
     </application>
-
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
 </manifest>

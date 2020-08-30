@@ -227,13 +227,17 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private String getBaseRomFileName() {
+    private String getVersionString() {
         String version = sharedPreferences.getString("version", "");
         if (version.equals("auto"))
             version = sharedPreferences.getString("autoVersion", "");
         if (version.equals(""))
-            version = "us";
-        return "baserom." + version.toLowerCase() + ".z64";
+            version = "US";
+        return version;
+    }
+
+    private String getBaseRomFileName() {
+        return "baserom." + getVersionString().toLowerCase() + ".z64";
     }
 
     @Override
@@ -369,6 +373,27 @@ public class MainActivity extends AppCompatActivity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("code", getString(R.string.setup_command));
         clipboard.setPrimaryClip(clip);
+    }
+
+    public void installApk(View view) {
+        //TODO this is Android 7+ only. Why can't they just keep old methods working? This is retarded.
+        Intent install = new Intent(Intent.ACTION_VIEW);
+        install.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        Uri apkFile;
+        try {
+            //Is there some better way to do this?
+            apkFile = DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("termuxDir", "")))
+                    .findFile("build")
+                    .findFile(getVersionString().toLowerCase() + "_pc")
+                    .findFile("sm64." + getVersionString().toLowerCase() + ".f3dex2e.apk").getUri();
+        } catch (Exception e) {
+            Toast.makeText(this, "APK not found!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        install.setDataAndType(apkFile,"application/vnd.android.package-archive");
+        install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(install);
     }
 
     //https://stackoverflow.com/questions/18752202/check-if-application-is-installed-android
