@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            String buildString = "./sm64AndroidBuilder make -b " + GetBranch() + GetOptions() + "-p \"" + GetFlags(flags) + "-j" + sharedPreferences.getInt("jobs", 4) + '"';
+            String buildString = "./sm64AndroidBuilder2 make -b " + GetBranch() + GetOptions() + "-p \"" + GetFlags(flags) + "-j" + sharedPreferences.getInt("jobs", 4) + '"';
 
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("code", buildString);
