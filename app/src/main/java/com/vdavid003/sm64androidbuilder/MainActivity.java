@@ -131,46 +131,48 @@ public class MainActivity extends AppCompatActivity {
         pathInvalidDialog.setOnShowListener(onShowListener);
         pathUnsetDialog.setOnShowListener(onShowListener);
 
-        branch = findViewById(R.id.branch);
-        if(sharedPreferences.contains("branch")) {
-            ((RadioButton)branch.getChildAt(sharedPreferences.getInt("branch", 1))).setChecked(true);
-        }
-
         flags = findViewById(R.id.flags);
         loadFlags(flags);
 
+        branch = findViewById(R.id.branch);
         branch.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 RadioButton radioButton = radioGroup.findViewById(i);
+                setEnableFlags(radioButton);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("branch", radioGroup.indexOfChild(radioButton));
                 editor.apply();
-                int j = 0;
-                for (CheckBox checkBox : getFlagCheckboxes(flags)) {
-                    checkBox.setEnabled(FlagsMap.get(radioButton.getText())[j]);
-                    j++;
-                }
             }
         });
-
-        RadioButton selectedBranch = branch.findViewById(branch.getCheckedRadioButtonId());
-        if (selectedBranch != null) {
-            int j = 0;
-            for (CheckBox checkBox : getFlagCheckboxes(flags)) {
-                checkBox.setEnabled(FlagsMap.get(selectedBranch.getText())[j]);
-                j++;
-            }
+        if(sharedPreferences.contains("branch")) {
+            ((RadioButton)branch.getChildAt(sharedPreferences.getInt("branch", 1))).setChecked(true);
         }
 
+        setEnableFlags((RadioButton)branch.findViewById(branch.getCheckedRadioButtonId()));
+
         ((TextView)findViewById(R.id.jobsInput)).setText(Integer.toString(sharedPreferences.getInt("jobs", 4)));
+        ((CheckBox)findViewById(R.id._60fpsPatch)).setChecked(sharedPreferences.getBoolean("60fps", false));
+        ((CheckBox)findViewById(R.id.r96Patch)).setChecked(sharedPreferences.getBoolean("render96", false));
+    }
+
+    private void setEnableFlags(RadioButton selected) {
+        int i = 0;
+        for (CheckBox checkBox : getFlagCheckboxes(flags)) {
+            checkBox.setEnabled(FlagsMap.get(selected.getText())[i]);
+            i++;
+        }
+        findViewById(R.id.r96Patch).setEnabled(selected.getText().equals("ex/nightly"));
+        findViewById(R.id._60fpsPatch).setEnabled(!selected.getText().equals("ex/master"));
     }
 
     @Override
     public void onPause() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("jobs", Integer.parseInt(((TextView)findViewById(R.id.jobsInput)).getText().toString()));
+        editor.putBoolean("60fps", ((CheckBox)findViewById(R.id._60fpsPatch)).isChecked());
+        editor.putBoolean("render96", ((CheckBox)findViewById(R.id.r96Patch)).isChecked());
         saveFlags(flags, editor);
         editor.apply();
         super.onPause();
@@ -316,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            String buildString = "./sm64AndroidBuilder2 make -b " + GetBranch() + GetOptions() + "-p \"" + GetFlags(flags) + "-j" + sharedPreferences.getInt("jobs", 4) + '"';
+            String buildString = "./sm64AndroidBuilder2 make -b " + GetBranch() + GetOptions() + "-p \"" + GetFlags(flags) + "-j" + sharedPreferences.getInt("jobs", 4) + '"' + GetPatches();
 
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("code", buildString);
@@ -358,6 +360,25 @@ public class MainActivity extends AppCompatActivity {
                     str.append(checkBox.getText()).append("=").append(checkBox.isChecked() ? "1" : "0").append(" ");
             }
         }
+        return str.toString();
+    }
+
+    private String GetPatches() {
+        CheckBox r96 = findViewById(R.id.r96Patch);
+        CheckBox _60fps = findViewById(R.id._60fpsPatch);
+        if (!(r96.isEnabled() && r96.isChecked()) && !(_60fps.isEnabled() && _60fps.isChecked()))
+            return "";
+        StringBuilder str = new StringBuilder(" -p \"");
+        if (r96.isEnabled() && r96.isChecked()) {
+            str.append("render96_android ");
+        }
+        if (_60fps.isEnabled() && _60fps.isChecked()) {
+            str.append("60fps");
+            if (((RadioButton)branch.findViewById(branch.getCheckedRadioButtonId())).getText().equals("ex/nightly")) {
+                str.append("_ex");
+            }
+        }
+        str.append('"');
         return str.toString();
     }
 

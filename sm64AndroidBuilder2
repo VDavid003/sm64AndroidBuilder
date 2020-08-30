@@ -3,7 +3,7 @@
 #non-v1 didn't have a built-in updater
 
 BASEDIR=sm64-port-android
-VERSION=1
+VERSION=2
 VCHECK=https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/helperVersion
 UPDATE=https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/sm64AndroidBuilder2
 ONLINEVERSION=$(wget -q -O - $VCHECK)
@@ -59,6 +59,11 @@ case "$1" in
 				BRANCH=$1
 				shift
 				;;
+			#patches -pa <patches> (in quotes, space seperated)
+			-pa|--patches)
+				PATCHES=($1)
+				shift
+				;;
 		esac
 	done
 
@@ -83,7 +88,22 @@ case "$1" in
 		git pull || fail "Failed to update! Check your network connection!"
 	fi
 
+	if [ ! -z "PATCHES" ];
+	then
+		for patch in ${PATCHES[@]}; do
+			git apply enhancements/$patch.patch
+		done
+	fi
+
 	if [ ! -z "$CLEAN" ]; then make clean; fi
 	make $PARAMS
+
+	if [ ! -z "PATCHES" ];
+	then
+		for ((i=${#PATCHES[@]}-1; i>=0; i--)); do
+			git apply -R enhancements/${PATCHES[$i]}.patch
+		done
+	fi
+
 	popd
 esac
