@@ -6,7 +6,7 @@ BASEDIR=sm64-port-android
 VERSION=2
 VCHECK=https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/helperVersion
 UPDATE=https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/sm64AndroidBuilder2
-ONLINEVERSION=$(wget -q -O - $VCHECK)
+ONLINEVERSION=$(wget --no-cache --no-cookies -q -O - $VCHECK)
 if [ -z $ONLINEVERSION ]; then ONLINEVERSION=0; fi
 
 fail() {
@@ -16,7 +16,7 @@ fail() {
 
 if [ $ONLINEVERSION -gt $VERSION ];
 then
-	wget $UPDATE -O sm64AndroidBuilder2
+	wget --no-cache --no-cookies $UPDATE -O sm64AndroidBuilder2
 	./sm64AndroidBuilder2 "$@"
 	exit 0
 fi
