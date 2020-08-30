@@ -13,9 +13,6 @@ import androidx.fragment.app.DialogFragment;
 
 public class SetupDialog extends DialogFragment {
 
-    public SetupDialog() {
-    }
-
     public static SetupDialog newInstance() {
         return new SetupDialog();
     }

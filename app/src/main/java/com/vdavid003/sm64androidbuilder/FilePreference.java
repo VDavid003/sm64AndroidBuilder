@@ -41,7 +41,7 @@ public class FilePreference extends Preference {
                 @Override
                 public void onActivityResult(Uri uri) {
                     if (uri != null) {
-                        ((AppCompatActivity)getContext()).getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                         String filePath = uri.toString();
                         setPath(filePath);
                     }

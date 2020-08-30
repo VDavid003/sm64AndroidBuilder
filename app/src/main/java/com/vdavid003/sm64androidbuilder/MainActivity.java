@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     RadioGroup branch;
     LinearLayout flags;
 
-    Map<String, boolean[]> FlagsMap = new HashMap<String, boolean[]>() {
+    final Map<String, boolean[]> FlagsMap = new HashMap<String, boolean[]>() {
         {
             put("master", new boolean[]{
                     true, //TOUCH_CONTROLS
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
         return "baserom." + getVersionString().toLowerCase() + ".z64";
     }
 
-    Thread UpdateCheckerThread = new Thread(new Runnable() {
+    final Thread UpdateCheckerThread = new Thread(new Runnable() {
         @Override
         public void run() {
             try  {
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
                 // Read and store the result line by line then return the entire string.
                 InputStream in = connection.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                Integer onlineVersion = Integer.parseInt(reader.readLine());
+                int onlineVersion = Integer.parseInt(reader.readLine());
                 in.close();
 
                 if (onlineVersion > BuildConfig.VERSION_CODE) {
