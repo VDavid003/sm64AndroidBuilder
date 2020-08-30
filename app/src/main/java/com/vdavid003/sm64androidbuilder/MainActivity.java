@@ -1,5 +1,8 @@
 package com.vdavid003.sm64androidbuilder;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,11 +16,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,9 +34,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     AlertDialog pathInvalidDialog;
     AlertDialog pathUnsetDialog;
+    AlertDialog updateDialog;
     final FragmentManager fm = getSupportFragmentManager();
     final SetupDialog setupDialog = SetupDialog.newInstance();
     RadioGroup branch;
@@ -109,6 +120,19 @@ public class MainActivity extends AppCompatActivity {
         pathUnsetDialog = pathErrorDialog
                 .setTitle("One or more paths are not set!")
                 .setMessage("Setting the in-termux sm64-port-android directory, and your baserom is necessary!").create();
+
+        updateDialog = new AlertDialog.Builder(this)
+                .setTitle("Update available!")
+                .setMessage("Download it now?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/VDavid003/sm64AndroidBuilder/releases")));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                }).create();
 
         //https://stackoverflow.com/a/7636468
         DialogInterface.OnShowListener onShowListener = new DialogInterface.OnShowListener() {
@@ -241,10 +265,39 @@ public class MainActivity extends AppCompatActivity {
         return "baserom." + getVersionString().toLowerCase() + ".z64";
     }
 
+    Thread UpdateCheckerThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            try  {
+                URLConnection connection = (new URL("https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/appVersion")).openConnection();
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                connection.connect();
+
+                // Read and store the result line by line then return the entire string.
+                InputStream in = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                Integer onlineVersion = Integer.parseInt(reader.readLine());
+                in.close();
+
+                if (onlineVersion > BuildConfig.VERSION_CODE) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            updateDialog.show();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    });
+
     @Override
     protected void onStart() {
         super.onStart();
         testPaths();
+        UpdateCheckerThread.start();
         //After this just so it appears above the path message.
         if(!sharedPreferences.getBoolean("initDone", false)) {
             setupDialog.show(fm, "setup_dialog");
