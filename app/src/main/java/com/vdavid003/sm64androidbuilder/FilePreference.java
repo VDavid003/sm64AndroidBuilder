@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 
 public class FilePreference extends Preference {
-    private String mPath;
+    private String mPath = "";
 
     public FilePreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

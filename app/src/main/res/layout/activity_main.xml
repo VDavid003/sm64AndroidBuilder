@@ -170,9 +170,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Install External Data"
-                android:onClick="copyBuild"
-                android:layout_weight="1"
-                android:enabled="false"/>
+                android:onClick="installData"
+                android:layout_weight="1"/>
         </LinearLayout>
         <Button
             android:id="@+id/buildButton"

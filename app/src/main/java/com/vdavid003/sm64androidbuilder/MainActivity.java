@@ -29,10 +29,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
         DialogInterface.OnShowListener onShowListener = new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                Button button1 = ((AlertDialog) pathInvalidDialog).getButton(AlertDialog.BUTTON_NEUTRAL);
-                Button button2 = ((AlertDialog) pathUnsetDialog).getButton(AlertDialog.BUTTON_NEUTRAL);
+                Button button1 = pathInvalidDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                Button button2 = pathUnsetDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
                 View.OnClickListener onClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private List<CheckBox> getFlagCheckboxes(LinearLayout parent) {
-        List<CheckBox> checkBoxList = new ArrayList<CheckBox>();
+        List<CheckBox> checkBoxList = new ArrayList<>();
         for (int i = 0; i < parent.getChildCount(); i++) {
             View view = parent.getChildAt(i);
             if (view instanceof LinearLayout)
@@ -274,6 +273,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Basically DocumentsContract.copyDocument with support for API level below 24
+    private void copyDocument_compatible(Uri sourceFile, Uri targetDir, String mimeType) throws IOException {
+        ParcelFileDescriptor sourceFileDescriptor = getContentResolver().openFileDescriptor(sourceFile, "r");
+        FileInputStream fileInputStream = new FileInputStream(sourceFileDescriptor.getFileDescriptor());
+
+        String targetDocId = DocumentsContract.getTreeDocumentId(targetDir);
+        Uri targetDirUri = DocumentsContract.buildDocumentUriUsingTree(targetDir, targetDocId );
+        Uri targetFile = DocumentsContract.createDocument(getContentResolver(), targetDirUri, mimeType, getBaseRomFileName());
+
+        ParcelFileDescriptor targetFileDescriptor = getContentResolver().
+                openFileDescriptor(targetFile, "w");
+        FileOutputStream fileOutputStream =
+                new FileOutputStream(targetFileDescriptor.getFileDescriptor());
+
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = fileInputStream.read(buf)) > 0) {
+            fileOutputStream.write(buf, 0, len);
+        }
+    }
+
     public void copyBuild(View view) {
         if (testPaths()) {
             //Delete it if it's different and it exists inside Termux
@@ -285,23 +305,8 @@ public class MainActivity extends AppCompatActivity {
             if (DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("termuxDir", ""))).findFile(getBaseRomFileName()) == null)
             try {
                 Uri sourceFile = Uri.parse(sharedPreferences.getString("baseROM", ""));
-                ParcelFileDescriptor sourceFileDescriptor = getContentResolver().openFileDescriptor(sourceFile, "r");
-                FileInputStream fileInputStream = new FileInputStream(sourceFileDescriptor.getFileDescriptor());
-
                 Uri targetUri = Uri.parse(sharedPreferences.getString("termuxDir", ""));
-                String targetDocId = DocumentsContract.getTreeDocumentId(targetUri);
-                Uri targetDirUri = DocumentsContract.buildDocumentUriUsingTree(targetUri, targetDocId );
-                Uri targetFile = DocumentsContract.createDocument(getContentResolver(), targetDirUri, "application/octet-stream", getBaseRomFileName());
-                ParcelFileDescriptor targetFileDescriptor = getContentResolver().
-                        openFileDescriptor(targetFile, "w");
-                FileOutputStream fileOutputStream =
-                        new FileOutputStream(targetFileDescriptor.getFileDescriptor());
-
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = fileInputStream.read(buf)) > 0) {
-                    fileOutputStream.write(buf, 0, len);
-                }
+                copyDocument_compatible(sourceFile, targetUri, "application/octet-stream");
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(getBaseRomFileName() +"SHA", sharedPreferences.getString("selectedSHA", ""));
@@ -394,6 +399,39 @@ public class MainActivity extends AppCompatActivity {
         install.setDataAndType(apkFile,"application/vnd.android.package-archive");
         install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(install);
+    }
+
+    public void installData(View view) {
+        if (sharedPreferences.getString("sm64Dir", "") == "") {
+            Toast.makeText(this, "Please set your com.vdavid003.sm64port/files directory", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, SettingsActivity.class));
+            return;
+        } else if (!DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("sm64Dir", ""))).exists()) {
+            Toast.makeText(this, "Your com.vdavid003.sm64port/files directory is invalid", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, SettingsActivity.class));
+            return;
+        }
+
+        Uri sourceFile;
+        try {
+            sourceFile = DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("termuxDir", "")))
+                    .findFile("build")
+                    .findFile(getVersionString().toLowerCase() + "_pc")
+                    .findFile("res")
+                    .findFile("base.zip").getUri();
+        } catch (Exception e) {
+            Toast.makeText(this, "Base.zip not found!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri targetUri = Uri.parse(sharedPreferences.getString("sm64Dir", ""));
+        try {
+            copyDocument_compatible(sourceFile, targetUri, "application/zip");
+        } catch (Exception e) {
+            Toast.makeText(this, "Error trying to copy base.zip!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(this, "Base.zip successfully installed!", Toast.LENGTH_SHORT).show();
     }
 
     //https://stackoverflow.com/questions/18752202/check-if-application-is-installed-android

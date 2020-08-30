@@ -10,6 +10,10 @@
             app:title="Base ROM"
             android:summary="%s"
             app:key="baseROM"/>
+        <com.vdavid003.sm64androidbuilder.DirectoryPreference
+            app:title="com.vdavid003.sm64port/files directory (optional)"
+            android:summary="%s"
+            app:key="sm64Dir"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Other">

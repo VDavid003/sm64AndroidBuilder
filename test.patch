@@ -1,0 +1,40 @@
+diff --git a/app/src/main/java/com/vdavid003/sm64androidbuilder/MainActivity.java b/app/src/main/java/com/vdavid003/sm64androidbuilder/MainActivity.java
+index ddb2497..d282156 100644
+--- a/app/src/main/java/com/vdavid003/sm64androidbuilder/MainActivity.java
++++ b/app/src/main/java/com/vdavid003/sm64androidbuilder/MainActivity.java
+@@ -274,6 +274,35 @@ public class MainActivity extends AppCompatActivity {
+         }
+     }
+ 
++    //Basically DocumentsContract.copyDocument with support for API level below 24 with File output support
++    private void copyDocument_compatible(Uri sourceFile, Uri targetDir, String mimeType) throws IOException {
++        ParcelFileDescriptor sourceFileDescriptor = getContentResolver().openFileDescriptor(sourceFile, "r");
++        FileInputStream fileInputStream = new FileInputStream(sourceFileDescriptor.getFileDescriptor());
++
++        Uri targetFile;
++        try {
++            String targetDocId = DocumentsContract.getTreeDocumentId(targetDir);
++            Uri targetDirUri = DocumentsContract.buildDocumentUriUsingTree(targetDir, targetDocId );
++            targetFile = DocumentsContract.createDocument(getContentResolver(), targetDirUri, mimeType, getBaseRomFileName());
++        } catch (Exception e) {
++            //Not DocumentFile probably, try it as a normal File
++            File file = new File(targetDir.getPath());
++            file.createNewFile();
++            targetFile = Uri.fromFile(file);
++        }
++
++        ParcelFileDescriptor targetFileDescriptor = getContentResolver().
++                openFileDescriptor(targetFile, "w");
++        FileOutputStream fileOutputStream =
++                new FileOutputStream(targetFileDescriptor.getFileDescriptor());
++
++        byte[] buf = new byte[1024];
++        int len;
++        while ((len = fileInputStream.read(buf)) > 0) {
++            fileOutputStream.write(buf, 0, len);
++        }
++    }
++
+     public void copyBuild(View view) {
+         if (testPaths()) {
+             //Delete it if it's different and it exists inside Termux
