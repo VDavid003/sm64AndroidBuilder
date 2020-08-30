@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
         CheckBox _60fps = findViewById(R.id._60fpsPatch);
         if (!(r96.isEnabled() && r96.isChecked()) && !(_60fps.isEnabled() && _60fps.isChecked()))
             return "";
-        StringBuilder str = new StringBuilder(" -p \"");
+        StringBuilder str = new StringBuilder(" -pa \"");
         if (r96.isEnabled() && r96.isChecked()) {
             str.append("render96_android ");
         }
