@@ -134,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).create();
 
+        UpdateCheckerThread.start();
+
         //https://stackoverflow.com/a/7636468
         DialogInterface.OnShowListener onShowListener = new DialogInterface.OnShowListener() {
             @Override
@@ -297,7 +299,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         testPaths();
-        UpdateCheckerThread.start();
         //After this just so it appears above the path message.
         if(!sharedPreferences.getBoolean("initDone", false)) {
             setupDialog.show(fm, "setup_dialog");
