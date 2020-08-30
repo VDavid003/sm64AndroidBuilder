@@ -330,13 +330,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Basically DocumentsContract.copyDocument with support for API level below 24
-    private void copyDocument_compatible(Uri sourceFile, Uri targetDir, String mimeType) throws IOException {
+    private void copyDocument_compatible(Uri sourceFile, Uri targetDir, String mimeType, String name) throws IOException {
         ParcelFileDescriptor sourceFileDescriptor = getContentResolver().openFileDescriptor(sourceFile, "r");
         FileInputStream fileInputStream = new FileInputStream(sourceFileDescriptor.getFileDescriptor());
 
         String targetDocId = DocumentsContract.getTreeDocumentId(targetDir);
         Uri targetDirUri = DocumentsContract.buildDocumentUriUsingTree(targetDir, targetDocId );
-        Uri targetFile = DocumentsContract.createDocument(getContentResolver(), targetDirUri, mimeType, getBaseRomFileName());
+        Uri targetFile = DocumentsContract.createDocument(getContentResolver(), targetDirUri, mimeType, name);
 
         ParcelFileDescriptor targetFileDescriptor = getContentResolver().
                 openFileDescriptor(targetFile, "w");
@@ -362,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Uri sourceFile = Uri.parse(sharedPreferences.getString("baseROM", ""));
                 Uri targetUri = Uri.parse(sharedPreferences.getString("termuxDir", ""));
-                copyDocument_compatible(sourceFile, targetUri, "application/octet-stream");
+                copyDocument_compatible(sourceFile, targetUri, "application/octet-stream", getBaseRomFileName());
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(getBaseRomFileName() +"SHA", sharedPreferences.getString("selectedSHA", ""));
@@ -500,13 +500,48 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Uri targetUri = Uri.parse(sharedPreferences.getString("sm64Dir", ""));
+        if (DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("sm64Dir", ""))).findFile("base.zip") != null) {
+            DocumentFile.fromTreeUri(this, Uri.parse(sharedPreferences.getString("sm64Dir", ""))).findFile("base.zip").delete();
+        }
         try {
-            copyDocument_compatible(sourceFile, targetUri, "application/zip");
+            copyDocument_compatible(sourceFile, targetUri, "application/zip", "base.zip");
         } catch (Exception e) {
             Toast.makeText(this, "Error trying to copy base.zip!", Toast.LENGTH_SHORT).show();
             return;
         }
         Toast.makeText(this, "Base.zip successfully installed!", Toast.LENGTH_SHORT).show();
+    }
+
+    final ActivityResultLauncher<String[]> zipSelector = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    if (uri != null) {
+                        Uri targetUri = Uri.parse(sharedPreferences.getString("termuxDir", ""));
+
+                        String fileName;
+                        try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                            cursor.moveToFirst();
+                            fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                            if (DocumentFile.fromTreeUri(getApplicationContext(), Uri.parse(sharedPreferences.getString("termuxDir", ""))).findFile(fileName) != null) {
+                                DocumentFile.fromTreeUri(getApplicationContext(), Uri.parse(sharedPreferences.getString("termuxDir", ""))).findFile(fileName).delete();
+                            }
+                            copyDocument_compatible(uri, targetUri, "application/zip", fileName);
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), "Error trying to copy zip!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("code", "pushd sm64-port-android && unzip -o " + fileName + " && rm " + fileName + " && popd");
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(getApplicationContext(), "Paste command inside Termux!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+    public void copyZip(View view) {
+        zipSelector.launch(new String[]{"application/zip"});
     }
 
     //https://stackoverflow.com/questions/18752202/check-if-application-is-installed-android
