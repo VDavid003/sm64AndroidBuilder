@@ -3,7 +3,7 @@
 #non-v1 didn't have a built-in updater
 
 BASEDIR=sm64-port-android
-VERSION=3
+VERSION=4
 VCHECK=https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/helperVersion
 UPDATE_HELPER=https://raw.githubusercontent.com/VDavid003/sm64AndroidBuilder/master/sm64AndroidBuilder2
 ONLINEVERSION=$(wget --no-cache --no-cookies -q -O - $VCHECK)
@@ -74,6 +74,7 @@ case "$1" in
 		mv *.z64 .git #Yes I know I'm moving it to .git but it's temporary so it's okay
 		rm -rf ./*
 		git reset --hard
+		./getSDL.sh
 		mv .git/*.z64 .
 	fi
 
