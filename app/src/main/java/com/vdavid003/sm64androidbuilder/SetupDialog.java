@@ -27,10 +27,10 @@ public class SetupDialog extends DialogFragment {
         TextView downloadText = view.findViewById(R.id.setupTermuxDownloadText);
         String strText;
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            strText = "Click below to download it from the Play Store!";
+            strText = "Click below to download it from F-Droid!\nNote that the Play Store version is outdated!";
         } else
         {
-            strText = "Click below to download the Android 5.x-6.x compatible version!";
+            strText = "Click below to download the Android 5.x-6.x compatible version! (unsupported!)";
         }
         downloadText.setText(strText);
 

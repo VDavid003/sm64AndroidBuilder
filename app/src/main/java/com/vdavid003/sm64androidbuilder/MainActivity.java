@@ -438,11 +438,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void download(View view) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.termux")));
-            } catch (android.content.ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.termux")));
-            }
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/en/packages/com.termux/")));
         }
         else {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://archive.org/download/termux-repositories-legacy/termux-app-git-debug.apk")));
