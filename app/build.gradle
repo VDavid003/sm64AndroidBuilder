@@ -7,8 +7,8 @@ android {
         applicationId "com.vdavid003.sm64androidbuilder"
         minSdkVersion 21 //Termux's lowest SDK version ever.
         targetSdkVersion 29
-        versionCode 81  //100 = 1.0.0
-        versionName "0.8.1"
+        versionCode 82  //100 = 1.0.0
+        versionName "0.8.2"
     }
     buildTypes {
         release {
