@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.jobsInput)).setText(Integer.toString(sharedPreferences.getInt("jobs", 4)));
         ((CheckBox)findViewById(R.id._60fpsPatch)).setChecked(sharedPreferences.getBoolean("60fps", false));
         ((CheckBox)findViewById(R.id.r96Patch)).setChecked(sharedPreferences.getBoolean("render96", false));
+        ((CheckBox)findViewById(R.id.dynosPatch)).setChecked(sharedPreferences.getBoolean("dynos", false));
     }
 
     private void setEnableFlags(RadioButton selected) {
@@ -191,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         }
         findViewById(R.id.r96Patch).setEnabled(selected.getText().equals("ex/nightly"));
         findViewById(R.id._60fpsPatch).setEnabled(!selected.getText().equals("ex/master"));
+        findViewById(R.id.dynosPatch).setEnabled(selected.getText().equals("ex/nightly"));
     }
 
     @Override
@@ -199,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("jobs", Integer.parseInt(((TextView)findViewById(R.id.jobsInput)).getText().toString()));
         editor.putBoolean("60fps", ((CheckBox)findViewById(R.id._60fpsPatch)).isChecked());
         editor.putBoolean("render96", ((CheckBox)findViewById(R.id.r96Patch)).isChecked());
+        editor.putBoolean("dynos", ((CheckBox)findViewById(R.id.dynosPatch)).isChecked());
         saveFlags(flags, editor);
         editor.apply();
         super.onPause();
@@ -420,11 +423,17 @@ public class MainActivity extends AppCompatActivity {
     private String GetPatches() {
         CheckBox r96 = findViewById(R.id.r96Patch);
         CheckBox _60fps = findViewById(R.id._60fpsPatch);
-        if (!(r96.isEnabled() && r96.isChecked()) && !(_60fps.isEnabled() && _60fps.isChecked()))
+        CheckBox dynos = findViewById(R.id.dynosPatch);
+        if (!(r96.isEnabled() && r96.isChecked()) &&
+            !(_60fps.isEnabled() && _60fps.isChecked()) &&
+            !(dynos.isEnabled() && dynos.isChecked()))
             return "";
         StringBuilder str = new StringBuilder(" -pa \"");
         if (r96.isEnabled() && r96.isChecked()) {
             str.append("render96_android ");
+        }
+        if (dynos.isEnabled() && dynos.isChecked()) {
+            str.append("DynOS.1.0 ");
         }
         if (_60fps.isEnabled() && _60fps.isChecked()) {
             str.append("60fps");

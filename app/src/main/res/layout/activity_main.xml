@@ -124,7 +124,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Render96_Android"/>
+                android:text="Render96_Android (legacy)"/>
+            <CheckBox
+                android:id="@+id/dynosPatch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="DynOS"/>
         </LinearLayout>
 
             <TextView
